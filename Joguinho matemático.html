@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Desafio Matemático e Geometria</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      text-align: center;
+      background: linear-gradient(to right, #4facfe, #00f2fe);
+      padding: 50px;
+      color: white;
+      margin: 0;
+    }
+    /* Estilização das abas */
+    .tab-buttons {
+      margin-bottom: 20px;
+    }
+    .tablink {
+      background-color: #ddd;
+      color: black;
+      padding: 10px 20px;
+      cursor: pointer;
+      display: inline-block;
+      border: none;
+      outline: none;
+      font-size: 16px;
+      margin-right: 5px;
+      border-radius: 5px 5px 0 0;
+    }
+    .tablink.active {
+      background-color: #007BFF;
+      color: white;
+    }
+    /* Container que recebe o conteúdo de cada aba */
+    .container {
+      background: rgba(255, 255, 255, 0.9);
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+      display: inline-block;
+      width: 80%;
+      max-width: 500px;
+      color: #333;
+    }
+    /* Esconde todo o conteúdo da aba por padrão */
+    .tabcontent {
+      display: none;
+    }
+    /* Aba padrão (desafio matemático) visível */
+    #math {
+      display: block;
+    }
+    h1 {
+      color: #007BFF;
+      font-size: 26px;
+    }
+    .question, .geomQuestion {
+      font-size: 24px;
+      margin: 20px 0;
+      font-weight: bold;
+    }
+    input, select {
+      padding: 10px;
+      font-size: 18px;
+      text-align: center;
+      width: 120px;
+      border-radius: 8px;
+      border: 2px solid #007BFF;
+    }
+    .btn {
+      display: block;
+      margin: 20px auto;
+      padding: 12px 25px;
+      background: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 18px;
+      transition: 0.3s;
+    }
+    .btn:hover {
+      background: #0056b3;
+    }
+    #score, #result, #geomScore, #geomResult {
+      font-size: 20px;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    /* Estilo da aba Geometria */
+    .shapes-container {
+      margin: 20px 0;
+    }
+    .shapes-container img {
+      width: 100px;
+      height: auto;
+      margin: 0 10px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Botões para troca de abas -->
+  <div class="tab-buttons">
+    <button class="tablink" onclick="openTab(event, 'math')" id="defaultTab">Desafio Matemático</button>
+    <button class="tablink" onclick="openTab(event, 'geometry')">Geometria</button>
+  </div>
+
+  <!-- Aba: Desafio Matemático -->
+  <div id="math" class="container tabcontent">
+    <h1>🔥 Desafio Matemático 🔥</h1>
+    <p id="score">Pontuação: 0</p>
+    <label for="operation">Escolha a operação:</label>
+    <select id="operation" onchange="generateQuestion()">
+      <option value="+">Adição</option>
+      <option value="-">Subtração</option>
+      <option value="*">Multiplicação</option>
+      <option value="/">Divisão</option>
+      <option value="sqrt">Raiz Quadrada</option>
+      <option value="pow">Potência</option>
+      <option value="log">Logaritmo</option>
+      <option value="sistema">Sistema de Equações</option>
+    </select>
+    <p class="question" id="question">Carregando pergunta...</p>
+    <input type="number" id="answer" placeholder="Sua resposta" step="any">
+    <button class="btn" onclick="checkAnswer()">Verificar</button>
+    <p id="result"></p>
+  </div>
+
+  <!-- Aba: Geometria -->
+  <div id="geometry" class="container tabcontent">
+    <h1>Geometria</h1>
+    <p>Veja as figuras geométricas abaixo:</p>
+    <div class="shapes-container">
+      <img src="quadrado.png" alt="Quadrado">
+      <img src="retangulo.png" alt="Retângulo">
+      <img src="triangulo.png" alt="Triângulo">
+    </div>
+    
+    <!-- Escolha para definir a figura para a pergunta -->
+    <label for="geomCategory">Selecione a figura:</label>
+    <select id="geomCategory" onchange="generateGeomQuestion()">
+      <option value="quadrado">Quadrado</option>
+      <option value="retangulo">Retângulo</option>
+      <option value="triangulo">Triângulo</option>
+    </select>
+    
+    <p id="geomScore">Pontuação Geometria: 0</p>
+    <p class="geomQuestion" id="geomQuestion">Carregando pergunta de geometria...</p>
+    <input type="number" id="geomAnswer" placeholder="Sua resposta" step="any">
+    <button class="btn" onclick="checkGeomAnswer()">Verificar Resposta</button>
+    <p id="geomResult"></p>
+  </div>
+
+  <script>
+    // Função para alternar as abas
+    function openTab(evt, tabName) {
+      var i, tabcontent, tablinks;
+      tabcontent = document.getElementsByClassName("tabcontent");
+      for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+      }
+      tablinks = document.getElementsByClassName("tablink");
+      for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+      }
+      document.getElementById(tabName).style.display = "block";
+      evt.currentTarget.className += " active";
+      // Se estiver na aba de geometria, gera uma pergunta de geometria
+      if (tabName === "geometry") {
+        generateGeomQuestion();
+      }
+    }
+
+    // Código do Desafio Matemático
+    let correctAnswer;
+    let score = 0;
+
+    function generateQuestion() {
+      let num1 = Math.floor(Math.random() * 20) + 1;
+      let num2 = Math.floor(Math.random() * 10) + 1;
+      let operation = document.getElementById("operation").value;
+
+      switch (operation) {
+        case '+':
+          correctAnswer = num1 + num2;
+          document.getElementById("question").textContent = `${num1} + ${num2} = ?`;
+          break;
+        case '-':
+          correctAnswer = num1 - num2;
+          document.getElementById("question").textContent = `${num1} - ${num2} = ?`;
+          break;
+        case '*':
+          correctAnswer = num1 * num2;
+          document.getElementById("question").textContent = `${num1} × ${num2} = ?`;
+          break;
+        case '/':
+          num1 = num2 * (Math.floor(Math.random() * 10) + 1);
+          correctAnswer = (num1 / num2).toFixed(2);
+          document.getElementById("question").textContent = `${num1} ÷ ${num2} = ? (2 casas decimais)`;
+          break;
+        case 'sqrt':
+          num1 = Math.pow(num2, 2);
+          correctAnswer = num2;
+          document.getElementById("question").textContent = `√${num1} = ?`;
+          break;
+        case 'pow':
+          correctAnswer = Math.pow(num1, 3);
+          document.getElementById("question").textContent = `${num1}³ = ?`;
+          break;
+        case 'log':
+          let base = [2, 10, Math.E][Math.floor(Math.random() * 3)];
+          num1 = Math.pow(base, num2);
+          correctAnswer = num2;
+          document.getElementById("question").textContent = `log${base}(${num1}) = ?`;
+          break;
+        case 'sistema':
+          let a = Math.floor(Math.random() * 10) + 1;
+          let b = Math.floor(Math.random() * 10) + 1;
+          let c = a * b + Math.floor(Math.random() * 5) + 1;
+          correctAnswer = (c - b) / a;
+          document.getElementById("question").textContent = `${a}x + ${b} = ${c}, x = ?`;
+          break;
+      }
+
+      document.getElementById("result").textContent = "";
+      document.getElementById("answer").value = "";
+    }
+
+    function checkAnswer() {
+      const userAnswer = parseFloat(document.getElementById("answer").value);
+      if (Math.abs(userAnswer - correctAnswer) < 0.01) {
+        document.getElementById("result").textContent = "✅ Correto! Parabéns!";
+        score++;
+      } else {
+        document.getElementById("result").textContent = "❌ Errado! Tente novamente.";
+        score = Math.max(0, score - 1);
+      }
+      document.getElementById("score").textContent = `Pontuação: ${score}`;
+    }
+
+    // Código de Geometria
+    let geomCorrectAnswer;
+    let geomScore = 0;
+
+    function generateGeomQuestion() {
+      // Lê a opção selecionada: quadrado, retângulo ou triângulo
+      const category = document.getElementById("geomCategory").value;
+      let questionText = "";
+      let rnd = 0;
+      
+      if (category === "quadrado") {
+        // Gera aleatoriamente uma pergunta de área ou perímetro para quadrado
+        rnd = Math.floor(Math.random() * 2); // 0: área, 1: perímetro
+        const L = Math.floor(Math.random() * 10) + 1;
+        if (rnd === 0) {
+          questionText = `Qual é a área de um quadrado com lado ${L}?`;
+          geomCorrectAnswer = L * L;
+        } else {
+          questionText = `Qual é o perímetro de um quadrado com lado ${L}?`;
+          geomCorrectAnswer = 4 * L;
+        }
+      } else if (category === "retangulo") {
+        // Gera aleatoriamente uma pergunta de área ou perímetro para retângulo
+        rnd = Math.floor(Math.random() * 2); // 0: área, 1: perímetro
+        const B = Math.floor(Math.random() * 15) + 1;
+        const H = Math.floor(Math.random() * 15) + 1;
+        if (rnd === 0) {
+          questionText = `Qual é a área de um retângulo com base ${B} e altura ${H}?`;
+          geomCorrectAnswer = B * H;
+        } else {
+          questionText = `Qual é o perímetro de um retângulo com base ${B} e altura ${H}?`;
+          geomCorrectAnswer = 2 * (B + H);
+        }
+      } else if (category === "triangulo") {
+        // Gera aleatoriamente uma pergunta de área (triângulo retângulo) ou perímetro (triângulo equilátero)
+        rnd = Math.floor(Math.random() * 2); // 0: área, 1: perímetro
+        if (rnd === 0) {
+          const B = Math.floor(Math.random() * 10) + 1;
+          const H = Math.floor(Math.random() * 10) + 1;
+          questionText = `Qual é a área de um triângulo retângulo com base ${B} e altura ${H}?`;
+          geomCorrectAnswer = (B * H) / 2;
+        } else {
+          const L = Math.floor(Math.random() * 10) + 1;
+          questionText = `Qual é o perímetro de um triângulo equilátero com lado ${L}?`;
+          geomCorrectAnswer = 3 * L;
+        }
+      }
+      
+      document.getElementById("geomQuestion").textContent = questionText;
+      document.getElementById("geomResult").textContent = "";
+      document.getElementById("geomAnswer").value = "";
+    }
+
+    function checkGeomAnswer() {
+      const userAnswer = parseFloat(document.getElementById("geomAnswer").value);
+      if (Math.abs(userAnswer - geomCorrectAnswer) < 0.01) {
+        document.getElementById("geomResult").textContent = "✅ Correto! Parabéns!";
+        geomScore++;
+      } else {
+        document.getElementById("geomResult").textContent = "❌ Errado! Tente novamente.";
+        geomScore = Math.max(0, geomScore - 1);
+      }
+      document.getElementById("geomScore").textContent = `Pontuação Geometria: ${geomScore}`;
+    }
+
+    // Inicialização: gera a primeira pergunta de matemática e define a aba padrão
+    window.onload = function() {
+      generateQuestion();
+      document.getElementById("defaultTab").click();
+    };
+  </script>
+</body>
+</html>
